@@ -13,7 +13,7 @@
       "target": [
         "AppImage"
       ],
-      "category": "Multimedia"
+      "category": "Utility"
     }
   },
   "repository": "https://github.com/thegamershollow/youtube-electron-app",
