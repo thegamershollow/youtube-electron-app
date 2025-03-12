@@ -1,43 +1,103 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow } = require('electron')
-const path = require('node:path')
 
-function createWindow () {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
+const streamingServices = {
+  youtube: {
+    appUrl: 'https://youtube.com/tv',
+    userAgent: 'Mozilla/5.0 (PS4; Leanback Shell) Gecko/20100101 Firefox/65.0 LeanbackShell/01.00.01.75 Sony PS4/ (PS4, , no, CH)',
+    zoomFactor: 0.5,
+  },
+  // Add other services here
+};
 
-  // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+function getServiceName() {
+  // Logic to determine the service name
+  return 'youtube';
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  createWindow()
+function createWindow() {
+  let serviceName, appUrl, userAgent, zoomFactor;
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+  if (process.env.APP_URL) {
+    // user provided manual APP_URL override, use it instead
+    appUrl = process.env.APP_URL;
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
-})
+    // other manual overrides
+    if (process.env.USER_AGENT) userAgent = process.env.USER_AGENT;
+    if (process.env.ZOOM_FACTOR)
+      zoomFactor = parseFloat(process.env.ZOOM_FACTOR);
+  } else {
+    serviceName = getServiceName();
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+    if (serviceName === "default") {
+      // render index.html, since no appName was provided
+      const win = new BrowserWindow({
+        width: 1280,
+        height: 720,
+        minWidth: 1280,
+        minHeight: 720,
+        maxWidth: 1280,
+        maxHeight: 720,
+        fullscreen: false,
+        autoHideMenuBar: true,
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+        },
+      });
+
+      win.webContents.setWindowOpenHandler((details) => {
+        shell.openExternal(details.url);
+        return { action: "deny" };
+      });
+    }
+
+    ({ appUrl, userAgent, zoomFactor } = streamingServices[serviceName] || {});
+  }
+
+  const win = new BrowserWindow({
+    fullscreen: true,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // pressing alt can bring up the menu bar even when its hidden. This accounts for that and disables it entirely
+  win.setMenu(null);
+
+  win.loadURL(
+    appUrl,
+    userAgent?.length
+      ? {
+          userAgent,
+        }
+      : {},
+  );
+
+  if (zoomFactor && zoomFactor > 0) {
+    win.webContents.on("did-finish-load", () => {
+      win.webContents.setZoomFactor(zoomFactor);
+    });
+  }
+
+  win.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+}
+
+app.whenReady().then(createWindow);
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
