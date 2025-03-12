@@ -1,6 +1,7 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
-const { blockWindowAds } = require('electron-ad-blocker');
+import { app, BrowserWindow, shell, session } from 'electron';
+import { ElectronBlocker } from '@ghostery/adblocker-electron';
+import fetch from 'cross-fetch'; // required 'fetch'
 
 const streamingServices = {
   youtube: {
@@ -18,7 +19,11 @@ function getServiceName() {
 
 function createWindow() {
   let serviceName, appUrl, userAgent, zoomFactor;
-  blockWindowAds(mainWindow);
+
+  ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
+    blocker.enableBlockingInSession(session.defaultSession);
+  });
+
   if (process.env.APP_URL) {
     // user provided manual APP_URL override, use it instead
     appUrl = process.env.APP_URL;
