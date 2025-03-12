@@ -4,15 +4,33 @@
   "description": "Youtube TV Wrapper for SteamOS",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
-  "repository": "",
+  "build": {
+    "appId": "com.thegamershollow.youtubetv",
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Multimedia"
+    }
+  },
+  "repository": "https://github.com/thegamershollow/youtube-electron-app",
   "keywords": [
-
+    "youtube",
+    "tv",
+    "wrapper",
+    "steamos"
   ],
   "author": "TheGamersHollow",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^35.0.1"
+    "electron": "^35.0.1",
+    "electron-builder": "^25.1.8"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "dependencies": {
+    "electron-ad-blocker": "^0.2.0"
   }
 }
