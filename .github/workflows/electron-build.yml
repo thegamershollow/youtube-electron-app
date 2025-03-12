@@ -1,0 +1,42 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "main"
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: set git global safe directory
+        run: |
+          pacman -Syu git npm --noconfirm
+          git config --global --add safe.directory $(realpath .)
+
+      - uses: actions/checkout@v4
+
+      - name: build AppImage
+        run: |
+          npm install
+          npm run build --linux
+          chmod +x dist/youtubetv.AppIamge
+        continue-on-error: true
+
+      - name: show files
+        run: |
+          ls ./dist/youtubetv.AppImage
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: StreamingServiceLauncher
+          path: ./dist/youtubetv.AppImage
