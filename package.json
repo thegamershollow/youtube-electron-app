@@ -1,0 +1,18 @@
+{
+  "name": "youtubetv",
+  "version": "0.0.1",
+  "description": "Youtube TV Wrapper for SteamOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "",
+  "keywords": [
+
+  ],
+  "author": "TheGamersHollow",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^35.0.1"
+  }
+}
