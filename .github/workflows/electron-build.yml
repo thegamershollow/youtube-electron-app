@@ -27,7 +27,7 @@ jobs:
       - name: build AppImage
         run: |
           npm install
-          npm run build --linux
+          npm run dist
           chmod +x dist/youtubetv.AppIamge
         continue-on-error: true
 
