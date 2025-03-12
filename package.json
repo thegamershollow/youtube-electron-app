@@ -13,7 +13,8 @@
       "target": [
         "AppImage"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "artifactName": "youtubetv.${ext}"
     }
   },
   "repository": "https://github.com/thegamershollow/youtube-electron-app",
