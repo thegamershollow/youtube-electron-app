@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow } = require('electron')
+const { blockWindowAds } = require('electron-ad-blocker');
 
 const streamingServices = {
   youtube: {
@@ -17,7 +18,7 @@ function getServiceName() {
 
 function createWindow() {
   let serviceName, appUrl, userAgent, zoomFactor;
-
+  blockWindowAds(mainWindow);
   if (process.env.APP_URL) {
     // user provided manual APP_URL override, use it instead
     appUrl = process.env.APP_URL;
